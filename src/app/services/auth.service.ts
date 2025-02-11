@@ -9,16 +9,21 @@ interface LoginRequest {
 }
 
 interface AuthResponse {
-  token: string;
-  role: string;
-  isMaster?: boolean;
+  success: boolean;
+  message: string;
+  data: {
+    token: string;
+    role: string;
+    isMaster?: boolean;
+  };
+  errors: string[];
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7182/api';
+  private apiUrl = 'https://localhost:7261/api/Login';
 
   constructor(private http: HttpClient) {}
 
@@ -26,15 +31,15 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
       .pipe(
         tap(response => {
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('role', response.role);
+          localStorage.setItem('token', response.data.token);
+         
         })
       );
   }
 
   logout(): void {
     localStorage.removeItem('token');
-    localStorage.removeItem('role');
+   
   }
 
   isAuthenticated(): boolean {
